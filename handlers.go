@@ -46,6 +46,6 @@ func AuthenticationMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 	})
 }
