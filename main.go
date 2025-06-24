@@ -1,8 +1,7 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"net/http"
 	"os"
 
 	r "github.com/redis/go-redis/v9"
@@ -21,9 +20,14 @@ var client *r.Client
 
 func main() {
 	defer client.Close()
-	redisKey := os.Getenv("REDIS_KEY")
-	ctx := context.Background()
-	val := client.Get(ctx, redisKey).Val()
-	fmt.Println(val)
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "80"
+	}
+
+	http.HandleFunc("GET /", getLikesHandler)
+	http.HandleFunc("POST /", postLikeHandler)
+	http.ListenAndServe(":"+port, nil)
 
 }
