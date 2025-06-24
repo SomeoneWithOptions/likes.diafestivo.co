@@ -14,9 +14,13 @@ func init() {
 		panic(err)
 	}
 	client = r.NewClient(opt)
+	requiredAuthToken = os.Getenv("AUTH")
+	redisKey = os.Getenv("REDIS_KEY")
 }
 
 var client *r.Client
+var requiredAuthToken string
+var redisKey string
 
 func main() {
 	defer client.Close()
@@ -26,8 +30,8 @@ func main() {
 		port = "8080"
 	}
 
-	http.HandleFunc("GET /", getLikesHandler)
-	http.HandleFunc("POST /", postLikeHandler)
+	http.Handle("GET /", AuthenticationMiddleware(getLikesHandler))
+	http.Handle("POST /", AuthenticationMiddleware(postLikeHandler))
 	http.ListenAndServe(":"+port, nil)
 
 }
