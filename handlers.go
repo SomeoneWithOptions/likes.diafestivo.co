@@ -33,7 +33,7 @@ func postLikeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AuthenticationMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		isAllowedOrigin := func(r *http.Request) bool {
 			return strings.Contains(r.Header.Get("Origin"), "diafestivo.co")
 		}
@@ -47,5 +47,5 @@ func AuthenticationMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-	})
+	}
 }
