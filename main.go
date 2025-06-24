@@ -7,6 +7,10 @@ import (
 	r "github.com/redis/go-redis/v9"
 )
 
+var client *r.Client
+var requiredAuthToken string
+var redisKey string
+
 func init() {
 
 	opt, err := r.ParseURL(os.Getenv("REDIS_URL"))
@@ -17,10 +21,6 @@ func init() {
 	requiredAuthToken = os.Getenv("AUTH")
 	redisKey = os.Getenv("REDIS_KEY")
 }
-
-var client *r.Client
-var requiredAuthToken string
-var redisKey string
 
 func main() {
 	defer client.Close()
