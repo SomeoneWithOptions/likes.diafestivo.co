@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	r "github.com/redis/go-redis/v9"
@@ -18,12 +19,13 @@ func getLikesHandler(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(c))
 }
 
 func postLikeHandler(w http.ResponseWriter, req *http.Request) {
-	_, err := client.Incr(req.Context(), redisKey).Result()
+	count, err := client.Incr(req.Context(), redisKey).Result()
 	if err != nil {
 		http.Error(w, "Failed to update likes", http.StatusInternalServerError)
 		return
@@ -31,7 +33,9 @@ func postLikeHandler(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(strconv.FormatInt(count, 10)))
 }
 
 func AuthenticationMiddleware(next http.HandlerFunc) http.HandlerFunc {
