@@ -2,32 +2,34 @@ package main
 
 import (
 	"net/http"
-	"os"
-	"strconv"
 	"strings"
+
+	r "github.com/redis/go-redis/v9"
 )
 
-func getLikesHandler(w http.ResponseWriter, r *http.Request) {
-	redisKey := os.Getenv("REDIS_KEY")
-
-	c := client.Get(r.Context(), redisKey).Val()
-	if c == "" {
+func getLikesHandler(w http.ResponseWriter, req *http.Request) {
+	c, err := client.Get(req.Context(), redisKey).Result()
+	if err == r.Nil {
 		c = "0"
+	} else if err != nil {
+		http.Error(w, "Failed to read likes", http.StatusInternalServerError)
+		return
 	}
-	w.Header().Set("Content-Type", "text/html")
+
+	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(c))
 }
 
-func postLikeHandler(w http.ResponseWriter, r *http.Request) {
-	redisKey := os.Getenv("REDIS_KEY")
+func postLikeHandler(w http.ResponseWriter, req *http.Request) {
+	_, err := client.Incr(req.Context(), redisKey).Result()
+	if err != nil {
+		http.Error(w, "Failed to update likes", http.StatusInternalServerError)
+		return
+	}
 
-	c := client.Get(r.Context(), redisKey).Val()
-	cn, _ := strconv.Atoi(c)
-	client.Set(r.Context(), redisKey, cn+1, 0)
-
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 }
