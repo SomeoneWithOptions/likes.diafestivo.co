@@ -1,10 +1,14 @@
 FROM golang:alpine AS build
-WORKDIR /app/
-COPY . .
+WORKDIR /app
+
+COPY go.mod go.sum ./
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o api .
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o api .
 
 FROM gcr.io/distroless/static-debian12
 WORKDIR /app
 COPY --from=build /app/api .
+USER nonroot:nonroot
 CMD ["/app/api"]
