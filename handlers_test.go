@@ -191,6 +191,22 @@ func TestLoadConfig(t *testing.T) {
 	}
 }
 
+func TestLoadConfigDefaultAllowedOriginsIncludesDev(t *testing.T) {
+	env := map[string]string{
+		"REDIS_URL": "redis://localhost:6379/0",
+		"REDIS_KEY": "likes",
+		"AUTH":      "secret",
+	}
+
+	cfg, err := loadConfig(func(key string) string { return env[key] })
+	if err != nil {
+		t.Fatalf("loadConfig returned error: %v", err)
+	}
+	if _, ok := cfg.AllowedOrigins["https://dev.diafestivo.co"]; !ok {
+		t.Fatal("missing dev allowed origin")
+	}
+}
+
 func TestLoadConfigRequiresAuth(t *testing.T) {
 	env := map[string]string{
 		"REDIS_URL": "redis://localhost:6379/0",

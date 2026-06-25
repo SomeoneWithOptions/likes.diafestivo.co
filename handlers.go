@@ -15,7 +15,7 @@ import (
 	redis "github.com/redis/go-redis/v9"
 )
 
-const defaultAllowedOrigins = "https://diafestivo.co,https://www.diafestivo.co"
+const defaultAllowedOrigins = "https://diafestivo.co,https://www.diafestivo.co,https://dev.diafestivo.co"
 
 type config struct {
 	RedisURL       string
