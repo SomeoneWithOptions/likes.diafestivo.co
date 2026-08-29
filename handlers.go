@@ -76,7 +76,7 @@ func loadConfig(getenv func(string) string) (config, error) {
 
 func parseAllowedOrigins(raw string) (map[string]struct{}, error) {
 	origins := make(map[string]struct{})
-	for _, part := range strings.Split(raw, ",") {
+	for part := range strings.SplitSeq(raw, ",") {
 		origin, ok := normalizeOrigin(part)
 		if !ok {
 			return nil, fmt.Errorf("invalid allowed origin %q", strings.TrimSpace(part))
